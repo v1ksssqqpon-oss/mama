@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>С Днём Рождения, Ксюша!</title>
+<style>
+  :root{
+    --bg-1:#2a1a4a;
+    --bg-2:#3d2470;
+    --bg-3:#5b3a9e;
+    --lav:#c9a9ff;
+    --lav-soft:#e6d4ff;
+    --gold:#f3d488;
+    --gold-deep:#c99a3a;
+    --white:#fdfbff;
+    --pink:#f3b9e6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+    color:var(--white);
+    background:linear-gradient(160deg,var(--bg-1) 0%,var(--bg-2) 45%,var(--bg-3) 100%);
+    overflow-x:hidden;
+    line-height:1.6;
+  }
+  .orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.35;z-index:0;pointer-events:none;}
+  .orb.a{width:420px;height:420px;background:#7d4fd6;top:-120px;left:-100px;}
+  .orb.b{width:360px;height:360px;background:#b988ff;bottom:-140px;right:-120px;}
+  .orb.c{width:280px;height:280px;background:#e0b3ff;top:40%;right:10%;opacity:.18;}
+
+  section{position:relative;z-index:2;}
+
+  /* ===== PRELOADER ===== */
+  .preloader{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#2a1a4a,#160b2e);transition:opacity .8s ease,visibility .8s ease;}
+  .preloader.hide{opacity:0;visibility:hidden;}
+  .pl-moon{position:relative;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8e0,#f3d488 60%,#c99a3a);box-shadow:0 0 55px rgba(243,212,136,.65);animation:plpulse 1.7s ease-in-out infinite;}
+  .pl-moon::after{content:"";position:absolute;top:12px;right:10px;width:66px;height:66px;border-radius:50%;background:#20113f;}
+  .pl-text{margin-top:30px;color:#e6d4ff;letter-spacing:.28em;text-transform:uppercase;font-size:12px;animation:plblink 1.7s ease-in-out infinite;}
+  @keyframes plpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.09);}}
+  @keyframes plblink{0%,100%{opacity:.35;}50%{opacity:1;}}
+
+  /* ===== TAROT INTRO OVERLAY ===== */
+  .tarot-overlay{
+    position:fixed;inset:0;z-index:100;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:32px 20px;
+    background:radial-gradient(circle at 50% 30%,#3a2568 0%,#241246 55%,#170b30 100%);
+    transition:opacity 1s ease, visibility 1s ease;
+  }
+  .tarot-overlay.hide{opacity:0;visibility:hidden;}
+  .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.7;
+    animation:twinkle 3s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:.9;}}
+
+  .tarot-title{
+    font-size:clamp(26px,5vw,44px);font-weight:800;
+    background:linear-gradient(120deg,#fff,var(--lav-soft),var(--gold));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    line-height:1.2;padding-bottom:4px;position:relative;z-index:2;
+  }
+  .tarot-desc{color:var(--lav-soft);font-weight:300;font-size:clamp(15px,2.4vw,19px);
+    margin-top:14px;max-width:440px;position:relative;z-index:2;}
+
+  .deck{display:flex;justify-content:center;align-items:flex-end;
+    margin-top:48px;margin-bottom:8px;position:relative;z-index:2;min-height:300px;}
+  .tcard{
+    width:clamp(130px,21vw,184px);aspect-ratio:2/3;
+    margin:0 -18px;cursor:pointer;position:relative;
+    transform-style:preserve-3d;
+    transition:transform .4s cubic-bezier(.2,.8,.3,1), margin .4s ease, opacity .5s ease;
+    opacity:0;animation:dealIn .6s ease forwards;
+  }
+  .tcard .inner{position:absolute;inset:0;transform-style:preserve-3d;
+    transition:transform .8s cubic-bezier(.4,.1,.2,1);}
+  .tcard.flipped .inner{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 14px 40px rgba(0,0,0,.45);overflow:hidden;}
+
+  /* card back */
+  .back{background:linear-gradient(150deg,#4a2c86,#6a44b8);border:2px solid var(--gold);}
+  .back::before{content:"";position:absolute;inset:7px;border:1px solid rgba(243,212,136,.55);border-radius:8px;}
+  .back .emblem{width:46%;aspect-ratio:1;border-radius:50%;position:relative;
+    background:radial-gradient(circle,rgba(243,212,136,.25),transparent 70%);}
+  .back .emblem::before{content:"";position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--gold) 0 4deg,transparent 4deg 30deg);
+    -webkit-mask:radial-gradient(circle,transparent 40%,#000 42%);mask:radial-gradient(circle,transparent 40%,#000 42%);opacity:.8;}
+  .back .emblem::after{content:"";position:absolute;top:50%;left:50%;width:30%;height:30%;
+    transform:translate(-50%,-50%);border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#ffe9a8,var(--gold-deep));box-shadow:0 0 14px rgba(243,212,136,.7);}
+
+  /* card front */
+  .front{transform:rotateY(180deg);
+    background:linear-gradient(165deg,#fdf6e3,#efd9a8);
+    border:2px solid var(--gold-deep);color:#3a2568;padding:10px 8px;}
+  .front .roman{font-size:12px;letter-spacing:.15em;font-weight:700;color:var(--gold-deep);}
+  .front .symbol{font-size:clamp(34px,6vw,48px);margin:6px 0;line-height:1;}
+  .front .tname{font-size:clamp(13px,2.2vw,16px);font-weight:800;color:#3a2568;letter-spacing:.02em;}
+
+  .hover-lift:hover{transform:translateY(-22px) scale(1.04);}
+  .deck.picked .tcard:not(.chosen){opacity:0;pointer-events:none;transform:translateY(30px) scale(.85);}
+  .deck.picked .tcard.chosen{margin:0;transform-origin:bottom center;transform:scale(1.04);}
+
+  .reading{max-width:440px;margin:56px auto 0;position:relative;z-index:2;
+    opacity:0;transform:translateY(16px);transition:opacity .7s ease .2s, transform .7s ease .2s;}
+  .reading.show{opacity:1;transform:translateY(0);}
+  .reading .rname{font-size:22px;font-weight:800;color:var(--gold);}
+  .reading .rmeaning{color:var(--lav-soft);font-weight:300;font-size:17px;margin-top:10px;}
+  .enter-btn{margin-top:28px;padding:14px 40px;border:none;border-radius:40px;cursor:pointer;
+    font-size:16px;font-weight:600;color:#2a1a4a;
+    background:linear-gradient(120deg,var(--gold),#ffe9a8);
+    box-shadow:0 10px 30px rgba(243,212,136,.4);transition:transform .25s ease, box-shadow .25s ease;}
+  .enter-btn:hover{transform:translateY(-3px);box-shadow:0 14px 38px rgba(243,212,136,.6);}
+
+  @keyframes dealIn{from{opacity:0;transform:translateY(40px) rotate(-6deg);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== HERO ===== */
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 24px;}
+  .eyebrow{letter-spacing:.4em;text-transform:uppercase;font-size:14px;color:var(--lav);margin-bottom:24px;font-weight:600;}
+  .name{font-size:clamp(64px,16vw,180px);font-weight:800;line-height:1;
+    background:linear-gradient(120deg,#fff 0%,var(--lav-soft) 40%,var(--gold) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    letter-spacing:-.02em;text-shadow:0 0 60px rgba(201,169,255,.15);padding-bottom:6px;}
+  .subtitle{margin-top:24px;font-size:clamp(18px,2.4vw,26px);color:var(--lav-soft);font-weight:300;min-height:1.4em;}
+  .cursor{display:inline-block;width:2px;background:var(--gold);margin-left:2px;animation:blink 1s step-end infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .age-badge{margin-top:48px;width:130px;height:130px;border-radius:50%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.14),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);
+    box-shadow:0 8px 40px rgba(123,79,214,.4);animation:floaty 4s ease-in-out infinite;}
+  .age-badge .num{font-size:52px;font-weight:800;color:var(--gold);line-height:1;}
+  .age-badge .lbl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lav-soft);margin-top:6px;}
+  .scroll-hint{margin-top:72px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--lav);}
+  .scroll-hint span{display:block;font-size:22px;margin-top:8px;animation:bounce 2s ease-in-out infinite;}
+
+  /* ===== SECTIONS ===== */
+  .section-wrap{max-width:900px;margin:0 auto;padding:120px 24px;}
+  .section-title{font-size:clamp(30px,5vw,52px);font-weight:800;text-align:center;line-height:1.15;padding:0 4px 6px;
+    background:linear-gradient(120deg,#fff,var(--lav-soft),var(--gold));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;}
+  .section-sub{text-align:center;color:var(--lav-soft);font-weight:300;font-size:18px;margin-bottom:64px;}
+
+  .reasons{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;}
+  .reason{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:22px;
+    backdrop-filter:blur(4px);transition:transform .3s ease, background .3s ease, box-shadow .3s ease;
+    opacity:0;transform:translateY(24px);}
+  .reason.show{opacity:1;transform:translateY(0);}
+  .reason:hover{transform:translateY(-6px) scale(1.02);background:rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(123,79,214,.35);}
+  .reason .rn{font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.1em;}
+  .reason p{margin-top:10px;font-size:16px;color:var(--white);font-weight:300;line-height:1.5;}
+
+  .cake-section{text-align:center;padding-bottom:120px;}
+  .cake-instr{color:var(--lav-soft);font-size:17px;margin-bottom:56px;font-weight:300;}
+  .cake-stage{position:relative;display:inline-block;cursor:pointer;user-select:none;}
+  .cake{position:relative;width:260px;height:230px;margin:0 auto;}
+  .plate{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:250px;height:26px;border-radius:50%;background:linear-gradient(180deg,#e9ddff,#b9a3e0);box-shadow:0 10px 24px rgba(0,0,0,.3);}
+  .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:16px;}
+  .tier1{bottom:20px;width:210px;height:80px;background:linear-gradient(180deg,#a875e8,#7d4fd6);}
+  .tier2{bottom:96px;width:160px;height:66px;background:linear-gradient(180deg,#c79bf2,#9a68e0);}
+  .frosting{position:absolute;left:50%;transform:translateX(-50%);height:22px;background:var(--lav-soft);border-radius:0 0 40px 40px;}
+  .frost1{bottom:92px;width:212px;}
+  .frost2{bottom:158px;width:162px;}
+  .candle{position:absolute;bottom:224px;left:50%;transform:translateX(-50%);width:12px;height:44px;
+    background:repeating-linear-gradient(45deg,#f3b9e6 0 6px,#fff 6px 12px);border-radius:3px;z-index:3;}
+  .flame{position:absolute;bottom:268px;left:50%;transform:translateX(-50%);width:16px;height:24px;
+    background:radial-gradient(circle at 50% 70%,#fff 0%,var(--gold) 40%,#ff9d3c 80%);
+    border-radius:50% 50% 50% 50%/60% 60% 40% 40%;box-shadow:0 0 24px 6px rgba(243,212,136,.7);
+    animation:flicker .35s ease-in-out infinite alternate;transform-origin:bottom center;z-index:4;}
+  .flame.out{opacity:0;transform:translateX(-50%) scale(.2);transition:all .5s ease;}
+  .smoke{position:absolute;bottom:268px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);opacity:0;}
+  .smoke.go{animation:smoke 1.4s ease-out forwards;}
+  .cake-done{margin-top:34px;font-size:22px;color:var(--gold);font-weight:600;opacity:0;transition:opacity .8s ease;}
+  .cake-done.show{opacity:1;}
+
+  .wish{max-width:720px;margin:0 auto;text-align:center;padding:0 24px 130px;}
+  .wish p{font-size:clamp(18px,2.4vw,24px);font-weight:300;color:var(--lav-soft);}
+  .heart{font-size:40px;margin-top:30px;animation:beat 1.4s ease-in-out infinite;}
+  .sign{margin-top:24px;font-size:16px;color:var(--lav);letter-spacing:.1em;}
+
+  @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+  @keyframes flicker{0%{transform:translateX(-50%) scaleY(1) rotate(-2deg);}100%{transform:translateX(-50%) scaleY(1.15) rotate(2deg);}}
+  @keyframes smoke{0%{opacity:.6;transform:translate(-50%,0) scale(1);}100%{opacity:0;transform:translate(-50%,-70px) scale(2.4);}}
+  @keyframes beat{0%,100%{transform:scale(1);}25%{transform:scale(1.2);}40%{transform:scale(1);}}
+
+  #confetti{position:fixed;inset:0;z-index:60;pointer-events:none;}
+
+  /* ===== BALLOONS ===== */
+  .balloons{display:flex;flex-wrap:wrap;justify-content:center;gap:44px 30px;min-height:200px;}
+  .balloon{position:relative;width:92px;height:114px;border-radius:50% 50% 48% 48%;cursor:pointer;animation:bfloat 3.6s ease-in-out infinite;transition:transform .25s ease,opacity .3s ease;}
+  .balloon::after{content:"";position:absolute;top:100%;left:50%;width:1px;height:40px;background:rgba(255,255,255,.35);}
+  .balloon:hover{transform:translateY(-8px) scale(1.05);}
+  .balloon.pop{transform:scale(0);opacity:0;}
+  @keyframes bfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+
+  /* ===== WISH STARS ===== */
+  .wishstars-section{padding-bottom:120px;}
+  .sky{position:relative;height:320px;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#180d34,#2a1a4a);border:1px solid rgba(255,255,255,.12);}
+  .sky .bgstar{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.6;animation:twinkle 3s ease-in-out infinite;}
+  .shooting{position:absolute;display:flex;align-items:center;gap:12px;white-space:nowrap;color:#fff;font-size:15px;font-weight:300;will-change:transform;}
+  .shooting .dot{width:11px;height:11px;border-radius:50%;background:radial-gradient(circle,#fff,#f3d488);box-shadow:0 0 18px 5px rgba(243,212,136,.85);flex:none;}
+  .shooting .tail{position:absolute;right:100%;top:50%;transform:translateY(-50%);width:90px;height:2px;background:linear-gradient(90deg,transparent,#f3d488);}
+</style>
+</head>
+<body>
+  <div class="orb a"></div>
+  <div class="orb b"></div>
+  <div class="orb c"></div>
+  <canvas id="confetti"></canvas>
+
+  <div class="preloader" id="preloader">
+    <div class="pl-moon"></div>
+    <div class="pl-text">создаём немного волшебства</div>
+  </div>
+
+  <!-- TAROT INTRO -->
+  <div class="tarot-overlay" id="tarot">
+    <div class="stars" id="stars"></div>
+    <h1 class="tarot-title">Вытяни своё предсказание на год</h1>
+    <p class="tarot-desc">Закрой глаза, загадай настроение на этот год и выбери карту сердцем</p>
+    <div class="deck" id="deck"></div>
+    <div class="reading" id="reading">
+      <div class="rname" id="rname"></div>
+      <div class="rmeaning" id="rmeaning"></div>
+      <button class="enter-btn" id="enterBtn">Открыть поздравление ✨</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">С Днём Рождения</div>
+    <h1 class="name">Ксюша</h1>
+    <div class="subtitle"><span id="typed"></span><span class="cursor">&nbsp;</span></div>
+    <div class="age-badge">
+      <div class="num">36</div>
+      <div class="lbl">и всё впереди</div>
+    </div>
+    <div class="scroll-hint">листай ниже<span>&#8595;</span></div>
+  </section>
+
+  <!-- REASONS -->
+  <section class="section-wrap">
+    <h2 class="section-title">36 причин, за что я тебя люблю</h2>
+    <p class="section-sub">по одной на каждый твой год</p>
+    <div class="reasons" id="reasons"></div>
+  </section>
+
+  <!-- BALLOONS -->
+  <section class="section-wrap balloons-section">
+    <h2 class="section-title">Лопни шарики</h2>
+    <p class="section-sub">в каждом спрятано тёплое слово</p>
+    <div class="balloons" id="balloons"></div>
+  </section>
+
+  <!-- CAKE -->
+  <section class="section-wrap cake-section">
+    <h2 class="section-title">Загадай желание</h2>
+    <p class="cake-instr">Нажми на тортик и задуй свечку</p>
+    <div class="cake-stage" id="cakeStage">
+      <div class="cake">
+        <div class="smoke" id="smoke"></div>
+        <div class="flame" id="flame"></div>
+        <div class="candle"></div>
+        <div class="frosting frost2"></div>
+        <div class="tier tier2"></div>
+        <div class="frosting frost1"></div>
+        <div class="tier tier1"></div>
+        <div class="plate"></div>
+      </div>
+    </div>
+    <div class="cake-done" id="cakeDone">Желание загадано! Пусть всё сбудется.</div>
+  </section>
+
+  <!-- WISH STARS -->
+  <section class="section-wrap wishstars-section">
+    <h2 class="section-title">Загадай на падающую звезду</h2>
+    <p class="section-sub">каждая звезда несёт пожелание для тебя</p>
+    <div class="sky" id="sky"></div>
+  </section>
+
+  <!-- WISH -->
+  <section class="wish">
+    <h2 class="section-title">Мамочка</h2>
+    <p>Спасибо, что ты у меня есть. Ты самая тёплая, добрая и красивая. Пусть этот год принесёт тебе много радости, здоровья и улыбок. Я тебя очень люблю.</p>
+    <div class="heart">&#128156;</div>
+    <div class="sign">с любовью</div>
+  </section>
+
+<script>
+  /* ---- preloader ---- */
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      var p=document.getElementById('preloader');
+      if(!p)return;
+      p.classList.add('hide');
+      setTimeout(function(){p.style.display='none';},800);
+    },1700);
+  });
+
+  /* ---- stars in overlay ---- */
+  const starsBox=document.getElementById('stars');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');s.className='star';
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    s.style.transform='scale('+(0.5+Math.random()*1.3)+')';
+    starsBox.appendChild(s);
+  }
+
+  /* ---- tarot deck (all positive cards) ---- */
+  const cards=[
+    {roman:'XIX', symbol:'\u2600\uFE0F', name:'Солнце', meaning:'Радость, тепло и успех во всём, что ты начинаешь. Год будет светлым.'},
+    {roman:'XVII', symbol:'\uD83C\uDF1F', name:'Звезда', meaning:'Надежда и вдохновение. Твои желания начнут сбываться.'},
+    {roman:'III', symbol:'\uD83D\uDC51', name:'Императрица', meaning:'Забота, любовь и изобилие. Карта настоящей мамы \u2014 твоя карта.'},
+    {roman:'XXI', symbol:'\uD83C\uDF0D', name:'Мир', meaning:'Гармония и завершённость. Впереди большие и приятные достижения.'},
+    {roman:'VIII', symbol:'\uD83E\uDD81', name:'Сила', meaning:'Внутренняя сила и доброе сердце помогут пройти через всё легко.'},
+    {roman:'X', symbol:'\uD83C\uDF40', name:'Колесо Фортуны', meaning:'Удача поворачивается к тебе лицом. Лови счастливые моменты.'}
+,
+    {roman:'VI', symbol:'\uD83D\uDC95', name:'Влюблённые', meaning:'Любовь и гармония рядом с теми, кто дорог.'},
+    {roman:'I', symbol:'\u2728', name:'Маг', meaning:'У тебя есть всё, чтобы воплотить любую мечту.'},
+    {roman:'XIV', symbol:'\uD83D\uDD4A\uFE0F', name:'Умеренность', meaning:'Баланс, спокойствие и внутренняя гармония.'}
+  ];
+  const deck=document.getElementById('deck');
+  const DECK_SIZE=6;
+  const fan=[-20,-12,-4,4,12,20];
+  const lift=[30,17,7,7,17,30];
+  for(let i=0;i<DECK_SIZE;i++){
+    const c=document.createElement('div');
+    c.className='tcard hover-lift';
+    c.style.animationDelay=(i*0.09)+'s';
+    c.style.setProperty('--rot',fan[i]+'deg');
+    c.innerHTML='<div class="inner">'+
+      '<div class="face back"><div class="emblem"></div></div>'+
+      '<div class="face front"><div class="roman"></div><div class="symbol"></div><div class="tname"></div></div>'+
+      '</div>';
+    // apply fan transform via wrapper
+    c.style.transform='rotate('+fan[i]+'deg) translateY('+lift[i]+'px)';
+    deck.appendChild(c);
+  }
+
+  let drawn=false;
+  const reading=document.getElementById('reading');
+  const rname=document.getElementById('rname');
+  const rmeaning=document.getElementById('rmeaning');
+
+  deck.querySelectorAll('.tcard').forEach(card=>{
+    card.addEventListener('click',()=>{
+      if(drawn)return;drawn=true;
+      const pick=cards[Math.floor(Math.random()*cards.length)];
+      const front=card.querySelector('.front');
+      front.querySelector('.roman').textContent=pick.roman;
+      front.querySelector('.symbol').textContent=pick.symbol;
+      front.querySelector('.tname').textContent=pick.name;
+      deck.querySelectorAll('.tcard').forEach(el=>{
+        el.style.animation='none';
+        if(el!==card){el.style.opacity='0';el.style.pointerEvents='none';el.style.transform='translateY(34px) scale(.82) rotate(0deg)';}
+      });
+      card.classList.remove('hover-lift');
+      card.classList.add('chosen');
+      card.style.opacity='1';
+      card.style.transformOrigin='bottom center';
+      card.style.transform='scale(1.04)';
+      deck.classList.add('picked');
+      setTimeout(()=>card.classList.add('flipped'),260);
+      setTimeout(()=>{
+        rname.textContent=pick.name;
+        rmeaning.textContent=pick.meaning;
+        reading.classList.add('show');
+      },900);
+      burst(window.innerWidth/2, window.innerHeight*0.4, 60);
+    });
+  });
+
+  document.getElementById('enterBtn').addEventListener('click',()=>{
+    document.getElementById('tarot').classList.add('hide');
+    setTimeout(()=>{document.getElementById('tarot').style.display='none';},1000);
+    setTimeout(()=>{rain();burst(window.innerWidth/2,window.innerHeight*0.3,70);},500);
+  });
+
+  /* ---- typewriter ---- */
+  const lines=['Сегодня твой день','Тебе 36 \u2014 и ты прекрасна','Этот сайт я сделал для тебя'];
+  const typed=document.getElementById('typed');
+  let li=0,ci=0,del=false;
+  function type(){
+    const cur=lines[li];
+    if(!del){typed.textContent=cur.slice(0,++ci);if(ci===cur.length){del=true;return setTimeout(type,1800);}}
+    else{typed.textContent=cur.slice(0,--ci);if(ci===0){del=false;li=(li+1)%lines.length;}}
+    setTimeout(type,del?35:70);
+  }
+  type();
+
+  /* ---- reasons ---- */
+  const reasons=[
+    'За твою тёплую улыбку','За то, что всегда рядом','За твои крепкие обнимашки',
+    'За вкусную еду по выходным','За твою заботу обо всех','За мудрые советы',
+    'За твой звонкий смех','За то, что веришь в меня','За твоё большое сердце',
+    'За терпение и доброту','За уютный дом','За твою искренность',
+    'За поддержку в трудные дни','За твою красоту','За общие воспоминания',
+    'За то, что учишь меня жизни','За твою силу','За твою нежность',
+    'За честность во всём','За твой оптимизм','За семейные традиции',
+    'За то, что ты моя мама','За твой вкус','За твою энергию',
+    'За добрые глаза','За твою щедрость','За то, что не сдаёшься',
+    'За твою заботу о себе','За наши разговоры','За твоё чувство юмора',
+    'За то, что ты пример для меня','За твою любовь','За твоё тепло',
+    'За то, что делаешь мир лучше','За каждый прожитый вместе день','Просто за то, что ты \u2014 это ты'
+  ];
+  const grid=document.getElementById('reasons');
+  reasons.forEach((r,i)=>{
+    const d=document.createElement('div');d.className='reason';
+    d.innerHTML='<div class="rn">\u2116'+(i+1)+'</div><p>'+r+'</p>';
+    grid.appendChild(d);
+  });
+  const io=new IntersectionObserver((es)=>{
+    es.forEach(e=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('show'),Math.random()*250);io.unobserve(e.target);}});
+  },{threshold:.15});
+  document.querySelectorAll('.reason').forEach(el=>io.observe(el));
+
+  /* ---- cake ---- */
+  const stage=document.getElementById('cakeStage');
+  const flame=document.getElementById('flame');
+  const smoke=document.getElementById('smoke');
+  const done=document.getElementById('cakeDone');
+  let blown=false;
+  stage.addEventListener('click',()=>{
+    if(blown)return;blown=true;
+    flame.classList.add('out');smoke.classList.add('go');done.classList.add('show');
+    burst(window.innerWidth/2, window.innerHeight*0.45, 90);
+  });
+
+  /* ---- balloons ---- */
+  const bwords=['Любимая','Красивая','Родная','Ты — счастье','Радость моя','Самая тёплая','Улыбайся','Ты лучшая'];
+  const bcolors=['#c9a9ff','#f3b9e6','#b988ff','#f3d488','#e6d4ff','#9a68e0','#d98fd0','#a875e8'];
+  const bbox=document.getElementById('balloons');
+  bwords.forEach(function(w,i){
+    const b=document.createElement('div');
+    b.className='balloon';
+    b.style.background='radial-gradient(circle at 35% 28%,rgba(255,255,255,.55),'+bcolors[i%bcolors.length]+')';
+    b.style.animationDelay=(i*0.22)+'s';
+    b.addEventListener('click',function(){
+      if(b.classList.contains('pop'))return;
+      const r=b.getBoundingClientRect();
+      b.classList.add('pop');
+      burst(r.left+r.width/2,r.top+r.height/2,50);
+      floatWord(w,r.left+r.width/2,r.top+r.height/2);
+    });
+    bbox.appendChild(b);
+  });
+  function floatWord(w,x,y){
+    const t=document.createElement('div');
+    t.textContent=w;
+    t.style.cssText='position:fixed;left:'+x+'px;top:'+y+'px;transform:translate(-50%,-50%);color:#f3d488;font-weight:700;font-size:20px;z-index:70;pointer-events:none;transition:all 1.4s ease;';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){t.style.top=(y-90)+'px';t.style.opacity='0';});
+    setTimeout(function(){t.remove();},1500);
+  }
+
+  /* ---- shooting star wishes ---- */
+  const wishes=['Здоровья и сил','Много улыбок','Исполнения мечты','Тепла и уюта','Любви близких','Радости каждый день','Новых открытий','Гармонии в душе'];
+  const sky=document.getElementById('sky');
+  for(let i=0;i<44;i++){const st=document.createElement('div');st.className='bgstar';st.style.left=Math.random()*100+'%';st.style.top=Math.random()*100+'%';st.style.animationDelay=(Math.random()*3)+'s';sky.appendChild(st);}
+  let wsi=0;
+  function shoot(){
+    if(!sky)return;
+    const el=document.createElement('div');
+    el.className='shooting';
+    const w=wishes[wsi%wishes.length];wsi++;
+    el.innerHTML='<span class="tail"></span><span class="dot"></span><span>'+w+'</span>';
+    el.style.top=(24+Math.random()*250)+'px';
+    el.style.left='-280px';
+    sky.appendChild(el);
+    const dist=sky.offsetWidth+340;
+    const dur=6500+Math.random()*2500;
+    el.animate([{transform:'translateX(0)'},{transform:'translateX('+dist+'px)'}],{duration:dur,easing:'linear'});
+    setTimeout(function(){el.remove();},dur);
+  }
+  setInterval(shoot,2600);
+  shoot();
+
+  /* ---- confetti ---- */
+  const cv=document.getElementById('confetti');
+  const ctx=cv.getContext('2d');
+  let W,H;function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;}size();addEventListener('resize',size);
+  const colors=['#c9a9ff','#f3d488','#f3b9e6','#e6d4ff','#b988ff','#ffffff'];
+  let parts=[];
+  function burst(x,y,n){
+    for(let i=0;i<n;i++){parts.push({x,y,vx:(Math.random()-.5)*10,vy:Math.random()*-12-3,g:.28+Math.random()*.15,s:6+Math.random()*7,r:Math.random()*Math.PI,vr:(Math.random()-.5)*.3,c:colors[Math.floor(Math.random()*colors.length)]});}
+  }
+  function rain(){
+    for(let i=0;i<80;i++){parts.push({x:Math.random()*W,y:Math.random()*-H*0.5,vx:(Math.random()-.5)*2,vy:Math.random()*3+2,g:.02,s:6+Math.random()*6,r:Math.random()*Math.PI,vr:(Math.random()-.5)*.2,c:colors[Math.floor(Math.random()*colors.length)]});}
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    parts.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);ctx.restore();});
+    parts=parts.filter(p=>p.y<H+40);
+    requestAnimationFrame(tick);
+  }
+  tick();
+</script>
+</body>
+</html>
